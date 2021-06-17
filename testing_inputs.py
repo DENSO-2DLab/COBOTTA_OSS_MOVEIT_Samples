@@ -36,7 +36,7 @@ def joint_inputs():
 	num_of_positions = int(input("Enter the number of positions needed: "))
 	keycard = 0
 	joints = []
-	while num_of_positions > keycard
+	while num_of_positions > keycard:
 		joint1 = float(input("Enter the value of joint 1: "))
 		j1 = joint1 /180 * math.pi
 		joint2 = float(input("Enter the value of joint 2: "))
@@ -95,17 +95,17 @@ if __name__ == '__main__':
 #    gripper_client = actionlib.SimpleActionClient('/cobotta/gripper_move',
 #                                                 GripperMoveAction)
 
-	joint_inputs()
+joint_inputs()
 
 
-        if not is_simulation() and is_motor_running() is not True:
-            print >> sys.stderr, "  Please motor on."
-            continue
+#if not is_simulation() and is_motor_running() is not True:
+#	print >> sys.stderr, "  Please motor on."
+#	continue
 
 #        gripper_move(gripper_client, gripper_width,
 #                    gripper_parallel_speed, gripper_parallel_effort)
 
-    print("Bye...")
+print("Bye...")
 planning_frame = move_group.get_planning_frame()
 print "=========== Planning frame: %s" % planning_frame
 print "=========== The Joint Positions:", joints_packing_old
