@@ -38,12 +38,18 @@ def joint_inputs():
 	joints = []
 	while num_of_positions > keycard
 		joint1 = float(input("Enter the value of joint 1: "))
+		j1 = joint1 /180 * math.pi
 		joint2 = float(input("Enter the value of joint 2: "))
+		j2 = joint2 /180 * math.pi
 		joint3 = float(input("Enter the value of joint 3: "))
+		j3 = joint3 /180 * math.pi
 		joint4 = float(input("Enter the value of joint 4: "))
+		j4 = joint4 /180 * math.pi
 		joint5 = float(input("Enter the value of joint 5: "))
+		j5 = joint5 /180 * math.pi
 		joint6 = float(input("Enter the value of joint 6: "))
-		pose = [joint1, joint2, joint3, joint4, joint5, joint6]
+		j6 = joint6 /180 * math.pi
+		pose = [j1, j2, j3, j4, j5, j6]
 		joints.append(pose)
 		num_of_positions = num_of_positions - 1
 	list_conversion = array(joints)
