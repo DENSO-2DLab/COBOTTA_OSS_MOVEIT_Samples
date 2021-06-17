@@ -12,6 +12,7 @@ import sys
 import rospy
 import actionlib
 import math
+from numpy import array
 import moveit_commander
 import rosservice
 import geometry_msgs.msg
@@ -20,23 +21,35 @@ from denso_cobotta_driver.srv import GetMotorState
 
 # NOTE: Before start this program, please launch denso_cobotta_bring.launch
 
-joints_name = ["joint_1", "joint_2",
-               "joint_3", "joint_4", "joint_5", "joint_6"]
 
-#
-# Poses
-#
-joints_packing_old = [30, 10, 54, 1, 118, -107]
-joints_packing_new = [90, -30, 120, -170, -94, 0]
-joints_home = [0, 30, 100, 0, 50, 0]
+
 
 #
 # Parallel gripper
 #
-gripper_parallel_open = 0.015
-gripper_parallel_close = 0.0
-gripper_parallel_speed = 10.0
-gripper_parallel_effort = 10.0
+#gripper_parallel_open = 0.015
+#gripper_parallel_close = 0.0
+#gripper_parallel_speed = 10.0
+#gripper_parallel_effort = 10.0
+
+def joint_inputs():
+	num_of_positions = int(input("Enter the number of positions needed: "))
+	keycard = 0
+	joints = []
+	while num_of_positions > keycard
+		joint1 = float(input("Enter the value of joint 1: "))
+		joint2 = float(input("Enter the value of joint 2: "))
+		joint3 = float(input("Enter the value of joint 3: "))
+		joint4 = float(input("Enter the value of joint 4: "))
+		joint5 = float(input("Enter the value of joint 5: "))
+		joint6 = float(input("Enter the value of joint 6: "))
+		pose = [joint1, joint2, joint3, joint4, joint5, joint6]
+		joints.append(pose)
+		num_of_positions = num_of_positions - 1
+	list_conversion = array(joints)
+	joint_goal = list_conversion
+	print("The joints have moved, here are the values: ", joint_goal)
+	arm_move(move_group, joint_goal)
 
 def arm_move(move_group, joint_goal):
     pose_radian = [x / 180.0 * math.pi for x in joint_goal]
@@ -44,12 +57,12 @@ def arm_move(move_group, joint_goal):
     move_group.stop()
 
 
-def gripper_move(gripper_client, width, speed, effort):
-    goal = GripperMoveGoal()
-    goal.target_position = width
-    goal.speed = speed
-    goal.effort = effort
-    gripper_client.send_goal(goal)
+#def gripper_move(gripper_client, width, speed, effort):
+#    goal = GripperMoveGoal()
+#    goal.target_position = width
+#    goal.speed = speed
+#    goal.effort = effort
+#    gripper_client.send_goal(goal)
 
 
 def is_motor_running():
@@ -73,39 +86,18 @@ if __name__ == '__main__':
     moveit_commander.roscpp_initialize(sys.argv)
     robot = moveit_commander.RobotCommander()
     move_group = moveit_commander.MoveGroupCommander("arm")
-    gripper_client = actionlib.SimpleActionClient('/cobotta/gripper_move',
-                                                  GripperMoveAction)
+#    gripper_client = actionlib.SimpleActionClient('/cobotta/gripper_move',
+#                                                 GripperMoveAction)
 
+	joint_inputs()
 
-    print(os.path.basename(__file__) + " sets pose goal and moves COBOTTA.")
-    print("0: Old packing pose, 1: New packing pose, 2: Home pose, Others: Exit")
-    while True:
-        input = raw_input("  Select the value: ")
-        if input.isdigit():
-            input = int(input)
-
-        joints = []
-        gripper_width = 0.0
-
-        if input == 0:
-            joints = joints_packing_old
-            gripper_width = gripper_parallel_open
-        elif input == 1:
-            joints = joints_packing_new
-            gripper_width = gripper_parallel_open
-        elif input == 2:
-            joints = joints_home
-            gripper_width = gripper_parallel_close
-        else:
-            break
 
         if not is_simulation() and is_motor_running() is not True:
             print >> sys.stderr, "  Please motor on."
             continue
 
-        gripper_move(gripper_client, gripper_width,
-                     gripper_parallel_speed, gripper_parallel_effort)
-        arm_move(move_group, joints)
+#        gripper_move(gripper_client, gripper_width,
+#                    gripper_parallel_speed, gripper_parallel_effort)
 
     print("Bye...")
 planning_frame = move_group.get_planning_frame()
