@@ -14,8 +14,9 @@ import math
 import moveit_commander
 import rosservice
 import geometry_msgs.msg
-from denso_cobotta_gripper.msg import GripperMoveAction, GripperMoveGoal
+from denso_cobotta_gripper.msg import VacuumMoveAction, VacuumMoveGoal
 from denso_cobotta_driver.srv import GetMotorState
+import time
 
 # NOTE: Before start this program, please launch denso_cobotta_bring.launch
 
@@ -25,9 +26,9 @@ from denso_cobotta_driver.srv import GetMotorState
 #
 # Poses
 #
-joints_packing_old = [30, 10, 54, 1, 118, -107]
-joints_packing_new = [90, -30, 120, -170, -94, 0]
-joints_home = [0, 30, 100, 0, 50, 0]
+grabing_pose = [-52, 85, 22, -107, -82, 162]
+middle_pose = [-57, -28, 103, -7, 107, 162]
+placing_pose = [-52, 27, 81, -26, 106, 162]
 
 #
 # Parallel gripper
@@ -35,7 +36,7 @@ joints_home = [0, 30, 100, 0, 50, 0]
 vacuum_blow = 1
 vacuum_stop = 0
 vacuum_suction = -1
-vacuum_power = 50.0
+vacuum_power_percentage = 100.0
 
 def arm_move(move_group, joint_goal):
     pose_radian = [x / 180.0 * math.pi for x in joint_goal]
@@ -43,10 +44,10 @@ def arm_move(move_group, joint_goal):
     move_group.stop()
 
 
-def gripper_move(vacuum_client, direction, power):
+def vacuum_move(vacuum_client, direction, power_percentage):
     goal = VacuumMoveGoal()
     goal.direction = direction
-    goal.power = power
+    goal.power_percentage = power_percentage
     vacuum_client.send_goal(goal)
 
 
@@ -74,53 +75,31 @@ if __name__ == '__main__':
     vacuum_client = actionlib.SimpleActionClient('/cobotta/vacuum_move',
                                                   VacuumMoveAction)
 
+joints = []
+vacuum_direction = 0
+key = 3
+while(key >= 0):
+	joints = grabing_pose
+	vacuum_dircetion = vacuum_suction
+	time.sleep(3)
+	
+	joints = middle_pose
+	time.sleep(3)
 
-    print(os.path.basename(__file__) + " sets pose goal and moves COBOTTA.")
-    print("0: Old packing pose, 1: New packing pose, 2: Home pose, Others: Exit")
-    while True:
-        input = raw_input("  Select the value: ")
-        if input.isdigit():
-            input = int(input)
+	joints = placing_pose
+	time.sleep(1)
+	vacuum_direction = vacuum_stop
+	time.sleep(3)
 
-        joints = []
-        vacuum_direction = 0.0
+	joints = middle_pose
+	time.sleep(1)
 
-        if input == 0:
-            joints = joints_packing_old
-            vacuum _dircetion = vacuum_suction
-        elif input == 1:
-            joints = joints_packing_new
-            vacuum_dircetion = vacuum_blow
-        elif input == 2:
-            joints = joints_home
-            vacuum_direction = vacuum_stop
-        else:
-            break
+	key = key - 1
 
         if not is_simulation() and is_motor_running() is not True:
             print >> sys.stderr, "  Please motor on."
             continue
 
-        gripper_move(gripper_client, gripper_width,
-                     gripper_parallel_speed, gripper_parallel_effort)
+        vacuum_move(vacuum_client, vacuum_direction, vacuum_power_percentage)
         arm_move(move_group, joints)
-
-    print("Bye...")
-planning_frame = move_group.get_planning_frame()
-print "=========== Planning frame: %s" % planning_frame
-print "=========== The Joint Positions:", joints_packing_old
-group_names = robot.get_group_names()
-print "=========== Available Planning Groups:", group_names
-print "=========== Current Pose:", move_group.get_current_pose().pose
-pose_goal = move_group.get_current_pose().pose
-pose_goal.position.x = 0.185
-pose_goal.position.y = 0
-move_group.go(pose_goal,wait=True)
-move_group.stop()
-#print joint_goal[1]
-#print joint_goal[2]
-#print joint_goal[3]
-#print joint_goal[4]
-#print joint_goal[5]
-#print pose_goal[6]
-
+        print("The End!!!!!!!!!!!!!!!")
