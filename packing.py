@@ -19,8 +19,8 @@ from denso_cobotta_driver.srv import GetMotorState
 
 # NOTE: Before start this program, please launch denso_cobotta_bring.launch
 
-joints_name = ["joint_1", "joint_2",
-               "joint_3", "joint_4", "joint_5", "joint_6"]
+#joints_name = ["joint_1", "joint_2",
+#               "joint_3", "joint_4", "joint_5", "joint_6"]
 
 #
 # Poses
@@ -32,10 +32,10 @@ joints_home = [0, 30, 100, 0, 50, 0]
 #
 # Parallel gripper
 #
-gripper_parallel_open = 0.015
-gripper_parallel_close = 0.0
-gripper_parallel_speed = 10.0
-gripper_parallel_effort = 10.0
+vacuum_blow = 1
+vacuum_stop = 0
+vacuum_suction = -1
+vacuum_power = 50.0
 
 def arm_move(move_group, joint_goal):
     pose_radian = [x / 180.0 * math.pi for x in joint_goal]
@@ -43,12 +43,11 @@ def arm_move(move_group, joint_goal):
     move_group.stop()
 
 
-def gripper_move(gripper_client, width, speed, effort):
-    goal = GripperMoveGoal()
-    goal.target_position = width
-    goal.speed = speed
-    goal.effort = effort
-    gripper_client.send_goal(goal)
+def gripper_move(vacuum_client, direction, power):
+    goal = VacuumMoveGoal()
+    goal.direction = direction
+    goal.power = power
+    vacuum_client.send_goal(goal)
 
 
 def is_motor_running():
@@ -72,8 +71,8 @@ if __name__ == '__main__':
     moveit_commander.roscpp_initialize(sys.argv)
     robot = moveit_commander.RobotCommander()
     move_group = moveit_commander.MoveGroupCommander("arm")
-    gripper_client = actionlib.SimpleActionClient('/cobotta/gripper_move',
-                                                  GripperMoveAction)
+    vacuum_client = actionlib.SimpleActionClient('/cobotta/vacuum_move',
+                                                  VacuumMoveAction)
 
 
     print(os.path.basename(__file__) + " sets pose goal and moves COBOTTA.")
@@ -84,17 +83,17 @@ if __name__ == '__main__':
             input = int(input)
 
         joints = []
-        gripper_width = 0.0
+        vacuum_direction = 0.0
 
         if input == 0:
             joints = joints_packing_old
-            gripper_width = gripper_parallel_open
+            vacuum _dircetion = vacuum_suction
         elif input == 1:
             joints = joints_packing_new
-            gripper_width = gripper_parallel_open
+            vacuum_dircetion = vacuum_blow
         elif input == 2:
             joints = joints_home
-            gripper_width = gripper_parallel_close
+            vacuum_direction = vacuum_stop
         else:
             break
 
