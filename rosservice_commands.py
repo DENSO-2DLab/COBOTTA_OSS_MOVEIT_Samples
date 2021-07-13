@@ -15,7 +15,7 @@ import moveit_commander
 import rosservice
 import geometry_msgs.msg
 from denso_cobotta_gripper.msg import GripperMoveAction, GripperMoveGoal
-from denso_cobotta_driver.srv import GetMotorState, SetMotorState
+from denso_cobotta_driver.srv import GetMotorState, SetMotorState, GetBrakeState
 
 #
 # Poses
@@ -59,11 +59,11 @@ def are_brakes_on():
 	rospy.wait_for_service('/cobotta/get_brake_state', 3.0)
 	try:
 		get_brake_state = rospy.ServiceProxy('/cobotta/get_brake_state', GetBrakeState)
-	res = get_brake_state()
-	print(res)
-	return res.state
-	except: rospy.ServiceException, e:
-	print >> sys.stderr, " Service call failed: %s" % math.e
+		res = get_brake_state()
+		print(res)
+		return res.state
+	except rospy.ServiceException, e:
+		print >> sys.stderr, " Service call failed: %s" % e
 
 
 def motor_status():
@@ -99,6 +99,7 @@ if __name__ == '__main__':
 
     print(os.path.basename(__file__) + " sets pose goal and moves COBOTTA.")
     motor_status()
+    are_brakes_on()
     print("0: Old packing pose, 1: New packing pose, 2: Home pose, Others: E1xit")
     while True:
         input = raw_input("  Select the value: ")
