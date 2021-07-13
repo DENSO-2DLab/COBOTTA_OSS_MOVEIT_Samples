@@ -55,6 +55,16 @@ def is_motor_running():
     except rospy.ServiceException, e:
         print >> sys.stderr, "  Service call failed: %s" % e
 
+def are_brakes_on():
+	rospy.wait_for_service('/cobotta/get_brake_state', 3.0)
+	try:
+		get_brake_state = rospy.ServiceProxy('/cobotta/get_brake_state', GetBrakeState)
+	res = get_brake_state()
+	print(res)
+	return res.state
+	except: rospy.ServiceException, e:
+	print >> sys.stderr, " Service call failed: %s" % math.e
+
 
 def motor_status():
 	rospy.wait_for_service('/cobotta/set_motor_state', 3.0)
@@ -89,7 +99,7 @@ if __name__ == '__main__':
 
     print(os.path.basename(__file__) + " sets pose goal and moves COBOTTA.")
     motor_status()
-    print("0: Old packing pose, 1: New packing pose, 2: Home pose, Others: Exit")
+    print("0: Old packing pose, 1: New packing pose, 2: Home pose, Others: E1xit")
     while True:
         input = raw_input("  Select the value: ")
         if input.isdigit():
