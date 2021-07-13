@@ -15,12 +15,7 @@ import moveit_commander
 import rosservice
 import geometry_msgs.msg
 from denso_cobotta_gripper.msg import GripperMoveAction, GripperMoveGoal
-from denso_cobotta_driver.srv import GetMotorState
-
-# NOTE: Before start this program, please launch denso_cobotta_bring.launch
-
-#joints_name = ["joint_1", "joint_2",
-#               "joint_3", "joint_4", "joint_5", "joint_6"]
+from denso_cobotta_driver.srv import GetMotorState, SetMotorState
 
 #
 # Poses
@@ -54,12 +49,28 @@ def gripper_move(gripper_client, width, speed, effort):
 def is_motor_running():
     rospy.wait_for_service('/cobotta/get_motor_state', 3.0)
     try:
-        get_motor_state = rospy.ServiceProxy('/cobotta/get_motor_state',
-                                             GetMotorState)
+        get_motor_state = rospy.ServiceProxy('/cobotta/get_motor_state', GetMotorState)
         res = get_motor_state()
         return res.state
     except rospy.ServiceException, e:
         print >> sys.stderr, "  Service call failed: %s" % e
+
+
+def motor_status():
+	rospy.wait_for_service('/cobotta/set_motor_state', 3.0)
+	motorstate = int(input("Enter '1' for motor on or '0' for motor off: "))
+	if motorstate == 1:
+		set_motor_state = rospy.ServiceProxy('/cobotta/set_motor_state', SetMotorState)
+		res = set_motor_state(True)
+		print(res)
+	elif motorstate == 0:
+		set_motor_state = rospy.ServiceProxy('/cobotta/set_motor_state', SetMotorState)
+		res = set_motor_state(False)
+		print(res)
+	else:
+		print('Invalid input, please try again!')
+		motor_status()
+
 
 def is_simulation():
     service_list = rosservice.get_service_list()
@@ -77,6 +88,7 @@ if __name__ == '__main__':
 
 
     print(os.path.basename(__file__) + " sets pose goal and moves COBOTTA.")
+    motor_status()
     print("0: Old packing pose, 1: New packing pose, 2: Home pose, Others: Exit")
     while True:
         input = raw_input("  Select the value: ")
@@ -107,21 +119,5 @@ if __name__ == '__main__':
         arm_move(move_group, joints)
 
     print("Bye...")
-planning_frame = move_group.get_planning_frame()
-print "=========== Planning frame: %s" % planning_frame
-print "=========== The Joint Positions:", joints_packing_old
-group_names = robot.get_group_names()
-print "=========== Available Planning Groups:", group_names
-print "=========== Current Pose:", move_group.get_current_pose().pose
-pose_goal = move_group.get_current_pose().pose
-pose_goal.position.x = 0.185
-pose_goal.position.y = 0
-move_group.go(pose_goal,wait=True)
-move_group.stop()
-#print joint_goal[1]
-#print joint_goal[2]
-#print joint_goal[3]
-#print joint_goal[4]
-#print joint_goal[5]
-#print pose_goal[6]
+
 
