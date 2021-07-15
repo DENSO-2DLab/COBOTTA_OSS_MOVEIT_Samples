@@ -27,12 +27,12 @@ import time
 # Poses
 #
 approach_grabing_pose = [-48, 71, 20, 40, 117, -34]
-grabing_pose = [-39, 78, 34, 40, 95, -41]
+grabing_pose = [-35, 78, 33, 34, 96, -38]
 middle_pose = [0, 0, 90, 0, 90, 0]
 dance_pose_1 = [89, 32, 119, -169, 90, 105]
 dance_pose_2 = [85, 28, 71, -22, -90, -117]
 approach_placing_pose = [-2, 21, 44, 58, 105, 19]
-placing_pose = [-10, 23, 64, 55, 98, 3]
+placing_pose = [-5, 23, 64, 55, 97, 2]
 
 #
 # Parallel gripper
