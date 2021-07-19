@@ -17,13 +17,15 @@ import time
 # These are the poses the COBOTTA will be taking
 #To change the poses, use Rviz to identify the pose and sub in the new joint values 
 #
-approach_grabing_pose = [-48, 71, 20, 40, 117, -34]    #Position for COBOTTA approaching the grabing of the object
-grabing_pose = [-35, 78, 33, 34, 96, -38]    #Position for COBOTTA grabing the object
+calset_pose = [150, -60, 140, -170, 135, 170]    #Position for COBOTTA to execute the CALSET
+approach_grabing_pose = [-42, 65, 43, 32, 108, -42]    #Position for COBOTTA approaching the grabing of the object
+grabing_pose = [-34, 63, 66, 33, 85, -48]    #Position for COBOTTA grabing the object
 middle_pose = [0, 0, 90, 0, 90, 0]    #Position for COBOTTA to be "centered"
 dance_pose_1 = [89, 32, 119, -169, 90, 105]    #Position for COBOTTA to move to and "show-off" its moves
 dance_pose_2 = [85, 28, 71, -22, -90, -117]    #Position for COBOTTA to move to and "show-off" its moves
-approach_placing_pose = [-2, 21, 44, 58, 105, 19]    #Position for COBOTTA approaching the placing of the object
-placing_pose = [-5, 23, 64, 55, 97, 2]    #Position for COBOTTA placing the object
+approach_placing_pose = [-1, 6, 64, 56, 100, 12]    #Position for COBOTTA approaching the placing of the object
+placing_pose = [6, 6, 84, 49, 84, 4]    #Position for COBOTTA placing the object
+
 
 #
 # These are the parameters the Vacuum gripper will abide by, both direction and power percentage
@@ -42,8 +44,8 @@ vacuum_power_percentage = 70.0    #The power_percentage will ensure how much pow
 
 def arm_move(move_group, joint_goal):
     pose_radian = [x / 180.0 * math.pi for x in joint_goal]    #Converts the angles from the positions into radians
-    move_group.set_max_acceleration_scaling_factor(1)    #Sets the servo motor's accleration to 100
-    move_group.set_max_velocity_scaling_factor(0.85)    #Sets the servo motor's velocity to 85
+    move_group.set_max_acceleration_scaling_factor(0.75)    #Sets the servo motor's accleration to 100
+    move_group.set_max_velocity_scaling_factor(0.65)    #Sets the servo motor's velocity to 85
     move_group.go(pose_radian, wait=True)    #Performs the action (moving to the position) of the COBOTTA's joints
     move_group.stop()    #Ensures the COBOTTA's joints will stop before moving on to the next action
 
@@ -108,52 +110,52 @@ vacuum_direction = 0    #a variable set equal to zero, but will change  when cha
 while True:
 	joints = middle_pose    #The empty joints array is stores the joint values of the middle_pose
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = approach_grabing_pose    #The empty joints array is stores the joint values of the appraoch_grabing_pose
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = grabing_pose    #The empty joints array is stores the joint values of the grabing_pose
 	vacuum_direction = vacuum_suction    #the vacuum_direction has been changed to the vacuum_suction
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
 	vacuum_move(vacuum_client, vacuum_direction, vacuum_power_percentage)    #the vacuum_move() function will have the vacuum carray out the action
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = approach_grabing_pose    #The empty joints array is stores the joint values of the appraoch_grabing_pose
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 	
 	joints = middle_pose    #The empty joints array is stores the joint values of the middle_pose
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = dance_pose_2    #The empty joints array is stores the joint values of the dance_pose_2
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = dance_pose_1    #The empty joints array is stores the joint values of the dance_pose_1
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = dance_pose_2    #The empty joints array is stores the joint values of the dance_pose_2
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = approach_placing_pose    #The empty joints array is stores the joint values of the appraoch_placing_pose
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = placing_pose    #The empty joints array is stores the joint values of the placing_pose
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(3)    #The COBOTTA will wait 0.5 seconds before moving on
 	vacuum_direction = vacuum_stop    #the vacuum_direction has been changed to the vacuum_stop
 	vacuum_move(vacuum_client, vacuum_direction, vacuum_power_percentage)    #the vacuum_move() function will have the vacuum carray out the action
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = approach_placing_pose    #The empty joints array is stores the joint values of the appraoch_placing_pose
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
-	time.sleep(0.5)    #The COBOTTA will wait 0.5 seconds before moving on
+	time.sleep(5)    #The COBOTTA will wait 0.5 seconds before moving on
 
 	joints = middle_pose    #The empty joints array is stores the joint values of the middle_pose
 	arm_move(move_group, joints)    #The arm_move(move_group, joints) function will move the joints position
