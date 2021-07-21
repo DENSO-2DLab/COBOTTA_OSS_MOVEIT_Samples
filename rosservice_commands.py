@@ -13,9 +13,10 @@ import actionlib
 import math
 import moveit_commander
 import rosservice
+import rostopic
 import geometry_msgs.msg
 from denso_cobotta_gripper.msg import GripperMoveAction, GripperMoveGoal
-from denso_cobotta_driver.srv import GetMotorState, SetMotorState, GetBrakeState, SetBrakeState
+from denso_cobotta_driver.srv import GetMotorState, SetMotorState, GetBrakeState, SetBrakeState, ExecCalset, SetLEDState, ClearError, ClearRobotError, ClearSafeState
 
 #
 # Poses
@@ -55,6 +56,7 @@ def is_motor_running():
     except rospy.ServiceException, e:
         print >> sys.stderr, "  Service call failed: %s" % e
 
+#checks if brakes are on/off
 def are_brakes_on():
 	rospy.wait_for_service('/cobotta/get_brake_state', 3.0)
 	try:
@@ -65,6 +67,7 @@ def are_brakes_on():
 	except rospy.ServiceException, e:
 		print >> sys.stderr, " Service call failed: %s" % e
 
+#sets brakes on/off
 def brakes_status():	
 	rospy.wait_for_service('/cobotta/set_brake_state', 3.0)
 	brakestate = int(input("Enter '1' for brakes to be on or '0' for brakes to be off: "))
@@ -80,7 +83,36 @@ def brakes_status():
 		print('Invalid input,please try again!')
 		brake_status()
 
+#clear errors
+def error_clearer():
+	rospy.wait_for_service('/cobotta/clear_error', 3.0)
+	rospy.wait_for_service('/cobotta/clear_robot_error', 3.0)
+	rospy.wait_for_service('/cobotta/clear_safe_state', 3.0)
+	check = int(input("Would you like to clear an error?\nEnter '1' for Yes or '0' for No: "))
+	if check == 0:
+		print('No errors here, moving on!')
+	elif check == 1:
+		error = int(input("What clearing error option do you want to use?\nEnter '1' for clear error, '2' for clear robot error, '3' for clear safe state: "))
+		if error == 1:
+			clear_error = rospy.ServiceProxy('/cobotta/clear_error', ClearError)
+			res = clear_error()
+			print(res)
+		elif error == 2:
+			clear_robot_error = rospy.ServiceProxy('/cobotta/clear_robot_error', ClearRobotError)
+			res = clear_robot_error()
+			print(res)
+		elif error == 3:
+			clear_safe_state = rospy.ServiceProxy('/cobotta/clear_safe_error', ClearSafeState)
+			res = clear_safe_state()
+			print(res)
+		else:
+			print("Invalid input! Try Again!")
+			error_clearer()
+	else:
+		print("Invalid input! Try again!")
+		error_clearer()
 
+#sets motor on/off
 def motor_status():
 	rospy.wait_for_service('/cobotta/set_motor_state', 3.0)
 	motorstate = int(input("Enter '1' for motor on or '0' for motor off: "))
@@ -96,6 +128,54 @@ def motor_status():
 		print('Invalid input, please try again!')
 		motor_status()
 
+#execute a calset
+def calset_execution():
+	exec_calset = rospy.ServiceProxy('/cobotta/exec_calset', ExecCalset)
+	res = exec_calset()
+	print(res)
+
+#Maniplautes the LEDs
+def manipulate_LED():
+	rospy.wait_for_service('/cobotta/set_LED_state', 3.0)
+	reds = int(input("Enter the amount of Red to use from 0 - 255: "))
+	if reds > 255:
+		print("Invalid Number! I said 0 - 255, START OVER!")
+		manipulate_LED()
+	elif reds < 0:
+		print("Invalid Number! I said 0 - 255, START OVER!")
+		manipulate_LED()
+	else:
+		print('Good Choice!')
+	greens = int(input("Enter the amount of Green to use from 0 - 255: "))
+	if greens > 255:
+		print("Invalid Number! I said 0 - 255, START OVER!")
+		manipulate_LED()
+	elif greens < 0:
+		print("Invalid Number! I said 0 - 255, START OVER!")
+		manipulate_LED()
+	else:
+		print('Good Choice!')
+	blues = int(input("Enter the amount of Blue to use from 0 - 255: "))
+	if blues > 255:
+		print("Invalid Number! I said 0 - 255, START OVER!")
+		manipulate_LED()
+	elif blues < 0:
+		print("Invalid Number! I said 0 - 255, START OVER!")
+		manipulate_LED()
+	else:
+		print('Good Choice!')
+	blink_rates = int(input("Enter the amount of how fast to blink from 0 - 255: "))
+	if blink_rates > 255:
+		print("Invalid Number! I said 0 - 255, START OVER!")
+		manipulate_LED()
+	elif blink_rates < 0:
+		print("Invalid Number! I said 0 - 255, START OVER!")
+		manipulate_LED()
+	else:
+		print('Good Choice!')
+	set_LED_state = rospy.ServiceProxy('/cobotta/set_LED_state', SetLEDState)
+	res = set_LED_state(reds, greens, blues, blink_rates)
+	print(res)
 
 def is_simulation():
     service_list = rosservice.get_service_list()
@@ -116,6 +196,9 @@ if __name__ == '__main__':
     motor_status()
     are_brakes_on()
     brakes_status()
+    error_clearer()
+    manipulate_LED()
+    calset_execution()
     print("0: Old packing pose, 1: New packing pose, 2: Home pose, Others: E1xit")
     while True:
         input = raw_input("  Select the value: ")
